@@ -1,8 +1,17 @@
 const mongoose = require('mongoose');
-const UserModel = require('../models/user.model')
-const   generateToken  = require('../utils/token')
+const UserModel = require('../models/user.model');
+const generateToken = require('../utils/token');
 
- const registerUserController = async (req, res) => {
+const sanitizeUser = (user) => {
+  if (!user) return null;
+
+  const safeUser = user.toObject ? user.toObject() : { ...user };
+  delete safeUser.password;
+  delete safeUser.refreshToken;
+  return safeUser;
+};
+
+const registerUserController = async (req, res) => {
   try {
     let { fullName, userName, email, password, mobile } = req.body;
 
@@ -56,7 +65,7 @@ const   generateToken  = require('../utils/token')
     return res.status(201).json({
       message: "user registered",
       success: true,
-      data: user,
+      data: sanitizeUser(user),
     });
   } catch (error) {
     console.log("error in reg", error);
@@ -118,10 +127,10 @@ const loginUserController = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return res.status(201).json({
+    return res.status(200).json({
       message: "user Logged in",
       success: true,
-      data: isExists,
+      data: sanitizeUser(isExists),
     });
   } catch (error) {
     console.log("error in reg", error);
@@ -168,7 +177,7 @@ const getCurrentUser = async(req, res)=>{
     return res.status(200).json({
       success: true,
       message: "login user",
-      data: req.user,
+      data: sanitizeUser(req.user),
     });
   } catch (error) {
     return res.status(500).json({

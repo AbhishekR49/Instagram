@@ -1,8 +1,8 @@
 const UserModel = require('../models/user.model');
 
-const getUserProfileController = async (req ,res)=>{
-    try {
-    let user = UserModel.findById(req.user._id).select(
+const getUserProfileController = async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.user._id).select(
       "-password -refreshToken",
     );
 
@@ -17,7 +17,7 @@ const getUserProfileController = async (req ,res)=>{
       success: false,
     });
   }
-}
+};
 
 
 module.exports = { getUserProfileController}
